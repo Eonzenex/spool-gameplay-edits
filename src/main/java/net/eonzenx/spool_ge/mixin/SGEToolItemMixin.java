@@ -5,7 +5,7 @@ import net.minecraft.item.ToolItem;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(ToolItem.class)
-public abstract class SGEToolItem implements IToolItem
+public abstract class SGEToolItemMixin implements IToolItem
 {
 
 }
