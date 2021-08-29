@@ -126,6 +126,8 @@ public abstract class SGELivingEntityMixin extends Entity implements ITravel
                 return Config.Wings.Feather.PITCH_MULTIPLIER;
             } else if (material == ToolMaterials.IRON) {
                 return Config.Wings.Hide.PITCH_MULTIPLIER;
+            } else if (material == ToolMaterials.DIAMOND) {
+                return Config.Wings.Elytra.PITCH_MULTIPLIER;
             }
         }
 
@@ -220,6 +222,12 @@ public abstract class SGELivingEntityMixin extends Entity implements ITravel
     }
 
 
+    /**
+     * @author EonZeNx
+     * @reason Can't change the glide code halfway through the function without overriding
+     * the entire function. All original travel code is maintained but sectioned into
+     * functions to allow other mods to hook into this mixin without overriding this mod.
+     */
     @Override
     public void travel(Vec3d movementInput) {
         if (this.canMoveVoluntarily() || this.isLogicalSideForUpdatingMovement()) {
@@ -254,6 +262,11 @@ public abstract class SGELivingEntityMixin extends Entity implements ITravel
         }
     }
 
+    /**
+     * @author EonZeNx
+     * @reason Either HEAD or TAIL inject results in weird behaviour, have to override the function.
+     * 
+     */
     @Inject(method = "tickFallFlying", at = @At("INVOKE"), cancellable = true)
     private void tickFallFlying(CallbackInfo ci) {
         var isFallFlying = this.getFlag(7);
