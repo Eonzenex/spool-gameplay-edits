@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " II",
+    "Ixx",
+    "xxx"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:stick"
+    },
+    "x": {
+      "tag": "minecraft:leaves"
+    }
+  },
+  "result": {
+    "item": "spool_ge:leaf_wing"
+  }
+}

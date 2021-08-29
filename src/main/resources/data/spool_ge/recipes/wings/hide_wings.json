@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "spool_ge:hide_wing" },
+    { "item": "spool_ge:hide_wing" }
+  ],
+  "result": {
+    "item": "spool_ge:hide_wings"
+  }
+}

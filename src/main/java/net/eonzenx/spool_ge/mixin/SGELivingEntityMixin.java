@@ -1,10 +1,8 @@
 package net.eonzenx.spool_ge.mixin;
 
 import net.eonzenx.spool_ge.entities.items.SGEElytraItem;
+import net.eonzenx.spool_ge.config.Config;
 import net.eonzenx.spool_ge.utils.mixin.travel.ITravel;
-import net.eonzenx.spool_ge.utils.mixin.travel.ITravelGliding;
-import net.eonzenx.spool_ge.utils.mixin.travel.ITravelLavaSwimming;
-import net.eonzenx.spool_ge.utils.mixin.travel.ITravelSwimming;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
@@ -12,11 +10,10 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ElytraItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.FluidTags;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -25,7 +22,6 @@ import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -120,6 +116,24 @@ public abstract class SGELivingEntityMixin extends Entity implements ITravel
     }
 
 
+    private float calcGlidePitchMultiplier(Item item) {
+        if (item instanceof SGEElytraItem sgeElytraItem) {
+            var material = sgeElytraItem.getMaterial();
+
+            if (material == ToolMaterials.WOOD) {
+                return Config.Wings.Leaf.PITCH_MULTIPLIER;
+            } else if (material == ToolMaterials.STONE) {
+                return Config.Wings.Feather.PITCH_MULTIPLIER;
+            } else if (material == ToolMaterials.IRON) {
+                return Config.Wings.Hide.PITCH_MULTIPLIER;
+            } else if (material == ToolMaterials.DIAMOND) {
+                return Config.Wings.Elytra.PITCH_MULTIPLIER;
+            }
+        }
+
+        return 1f;
+    }
+
     public void travelGliding(Vec3d movementInput, double fallSpeed) {
         var velocity = this.getVelocity();
 
@@ -132,8 +146,13 @@ public abstract class SGELivingEntityMixin extends Entity implements ITravel
         var xzRotationLength = Math.sqrt(rotation.x * rotation.x + rotation.z * rotation.z);
         var xzVelocityLength = velocity.horizontalLength();
         var rotationLength = rotation.length();
+
         var n = MathHelper.cos(j);
         n = (float) ((double) n * (double) n * Math.min(1.0D, rotationLength / 0.4D));
+
+        var item = this.getEquippedStack(EquipmentSlot.CHEST).getItem();
+        n *= calcGlidePitchMultiplier(item);
+
         velocity = this.getVelocity().add(0.0D, fallSpeed * (-1.0D + (double) n * 0.75D), 0.0D);
         double q;
         if (velocity.y < 0.0D && xzRotationLength > 0.0D) {
@@ -203,6 +222,12 @@ public abstract class SGELivingEntityMixin extends Entity implements ITravel
     }
 
 
+    /**
+     * @author EonZeNx
+     * @reason Can't change the glide code halfway through the function without overriding
+     * the entire function. All original travel code is maintained but sectioned into
+     * functions to allow other mods to hook into this mixin without overriding this mod.
+     */
     @Override
     public void travel(Vec3d movementInput) {
         if (this.canMoveVoluntarily() || this.isLogicalSideForUpdatingMovement()) {
@@ -237,6 +262,11 @@ public abstract class SGELivingEntityMixin extends Entity implements ITravel
         }
     }
 
+    /**
+     * @author EonZeNx
+     * @reason Either HEAD or TAIL inject results in weird behaviour, have to override the function.
+     * 
+     */
     @Inject(method = "tickFallFlying", at = @At("INVOKE"), cancellable = true)
     private void tickFallFlying(CallbackInfo ci) {
         var isFallFlying = this.getFlag(7);

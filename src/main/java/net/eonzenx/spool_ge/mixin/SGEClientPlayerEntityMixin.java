@@ -23,9 +23,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(ClientPlayerEntity.class)
-public abstract class SGEClientPlayerEntity extends PlayerEntity
+public abstract class SGEClientPlayerEntityMixin extends PlayerEntity
 {
-    public SGEClientPlayerEntity(World world, BlockPos pos, float yaw, GameProfile profile) {
+    public SGEClientPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
         super(world, pos, yaw, profile);
     }
 

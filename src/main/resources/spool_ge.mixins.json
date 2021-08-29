@@ -4,12 +4,13 @@
   "package": "net.eonzenx.spool_ge.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "SGEElytraFeatureRendererMixin",
     "SGELivingEntityMixin",
     "SGEPlayerEntityMixin",
-    "SGEToolItem"
+    "SGEToolItemMixin"
   ],
   "client": [
-    "SGEClientPlayerEntity"
+    "SGEClientPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
