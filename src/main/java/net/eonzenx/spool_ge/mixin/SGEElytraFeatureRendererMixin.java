@@ -57,6 +57,10 @@ public abstract class SGEElytraFeatureRendererMixin<T extends LivingEntity, M ex
         return SKIN;
     }
 
+    /**
+     * @author EonZeNx
+     * @reason Cannot hook halfway into a function to change one line about Items.Elytra -> instanceof ElytraItem
+     */
     @Override
     public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, T livingEntity, float f, float g, float h, float j, float k, float l) {
         var itemStack = livingEntity.getEquippedStack(EquipmentSlot.CHEST);

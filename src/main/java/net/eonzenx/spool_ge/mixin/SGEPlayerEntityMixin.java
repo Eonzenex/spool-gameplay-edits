@@ -4,6 +4,7 @@ import net.eonzenx.spool_ge.utils.mixin.travel.ICheckGliding;
 import net.eonzenx.spool_ge.utils.mixin.travel.ITravel;
 import net.eonzenx.spool_ge.utils.mixin.travel.ITravelFlying;
 import net.eonzenx.spool_ge.utils.mixin.travel.ITravelSwimming;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -12,12 +13,19 @@ import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Optional;
 
 @Mixin(PlayerEntity.class)
 public abstract class SGEPlayerEntityMixin extends LivingEntity implements ITravel, ITravelFlying, ITravelSwimming, ICheckGliding
@@ -31,6 +39,9 @@ public abstract class SGEPlayerEntityMixin extends LivingEntity implements ITrav
 
     @Shadow public abstract void increaseTravelMotionStats(double dx, double dy, double dz);
     @Shadow public abstract void startFallFlying();
+
+
+    private int bedRespawns;
 
 
     @Override
