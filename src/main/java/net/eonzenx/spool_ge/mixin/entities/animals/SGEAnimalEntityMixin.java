@@ -157,20 +157,20 @@ public abstract class SGEAnimalEntityMixin extends MobEntity implements IBreedab
         var didEat = new AtomicBoolean(false);
         if (isBreedableItem(stack) && canEatBreedable()) {
             BREEDABLE_ITEMS.ifLeft(itemTag -> {
-                eatUsingTag(stack, itemTag, Config.Animals.Happiness.BREEDABLE_HAPPINESS, 0);
+                eatUsingTag(stack, itemTag, Config.Animals.Happiness.BREEDABLE_HAPPINESS);
                 didEat.set(true);
             });
             BREEDABLE_ITEMS.ifRight(item -> {
-                eatUsingStack(item, stack, Config.Animals.Happiness.BREEDABLE_HAPPINESS, 0);
+                eatUsingStack(item, stack, Config.Animals.Happiness.BREEDABLE_HAPPINESS);
                 didEat.set(true);
             });
         } else if (isEdibleItem(stack) && canEatEdible()) {
             EDIBLE_ITEMS.ifLeft(itemTag -> {
-                eatUsingTag(stack, itemTag, Config.Animals.Happiness.EDIBLE_HAPPINESS, 1);
+                eatUsingTag(stack, itemTag, Config.Animals.Happiness.EDIBLE_HAPPINESS);
                 didEat.set(true);
             });
             EDIBLE_ITEMS.ifRight(item -> {
-                eatUsingStack(item, stack, Config.Animals.Happiness.EDIBLE_HAPPINESS, 1);
+                eatUsingStack(item, stack, Config.Animals.Happiness.EDIBLE_HAPPINESS);
                 didEat.set(true);
             });
         }
@@ -182,12 +182,17 @@ public abstract class SGEAnimalEntityMixin extends MobEntity implements IBreedab
     public void postEat(ItemStack stack) {
         var timer = Config.Animals.Happiness.calcEatTimer(this);
         setEatTimeout(timer);
+
         playEatSound(stack);
-        eatFood(world, stack);
+        var bite = getStatusByte(getEdibleType(stack));
+        world.sendEntityStatus(this, bite);
 
         if (isBreedableItem(stack) && !isBaby()) {
             lovePlayer(null);
         }
+
+        // This eats the stack and reduces stack to air, must be placed last
+        eatFood(world, stack);
     }
 
     @Override
@@ -197,12 +202,11 @@ public abstract class SGEAnimalEntityMixin extends MobEntity implements IBreedab
     // </editor-folds>
 
 
-    public ParticleEffect getParticleEffect(int edible) {
-        return switch (edible) {
-            case 0 -> ParticleTypes.COMPOSTER;
-            case 1 -> ParticleTypes.CRIT;
-            default -> ParticleTypes.CRIT;
-        };
+    public int getEdibleType(ItemStack stack) {
+        if (isBreedableItem(stack)) return 0;
+        if (isEdibleItem(stack)) return 1;
+
+        return -1;
     }
 
     public byte getStatusByte(int edible) {
@@ -213,21 +217,15 @@ public abstract class SGEAnimalEntityMixin extends MobEntity implements IBreedab
         };
     }
 
-    private void eatUsingTag(ItemStack stack, Tag<Item> itemTag, float happiness, int edible) {
+    private void eatUsingTag(ItemStack stack, Tag<Item> itemTag, float happiness) {
         if (stack.isIn(itemTag)) {
             addHappiness(happiness);
-
-            var bite = getStatusByte(edible);
-            world.sendEntityStatus(this, bite);
         }
     }
 
-    private void eatUsingStack(Item item, ItemStack stack, float happiness, int edible) {
+    private void eatUsingStack(Item item, ItemStack stack, float happiness) {
         if (item.getDefaultStack() == stack) {
             addHappiness(happiness);
-
-            var bite = getStatusByte(edible);
-            world.sendEntityStatus(this, bite);
         }
     }
 
@@ -246,9 +244,17 @@ public abstract class SGEAnimalEntityMixin extends MobEntity implements IBreedab
 
     @Inject(method = "interactMob", at = @At("HEAD"))
     public void interactMob(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        if (!this.world.isClient) {
-            var itemStack = player.getStackInHand(hand);
-            this.eat(itemStack);
+        if (!world.isClient) {
+            var stack = player.getStackInHand(hand);
+
+            var isEdibleItem = isEdibleItem(stack);
+            var isBreedableItem = isBreedableItem(stack);
+
+            if (!(isEdibleItem || isBreedableItem)) return;
+            if (isEdibleItem && !canEatEdible()) return;
+            if (isBreedableItem && !canEatBreedable()) return;
+
+            eat(stack);
         }
     }
 
@@ -258,8 +264,16 @@ public abstract class SGEAnimalEntityMixin extends MobEntity implements IBreedab
             var d = random.nextGaussian() * 0.02D;
             var e = random.nextGaussian() * 0.02D;
             var f = random.nextGaussian() * 0.02D;
-            world.addParticle(effect, this.getParticleX(1.0D), this.getRandomBodyY() + 0.5D, this.getParticleZ(1.0D), d, e, f);
+            world.addParticle(effect, getParticleX(1.0D), getRandomBodyY() + 0.5D, getParticleZ(1.0D), d, e, f);
         }
+    }
+
+    public ParticleEffect getParticleEffect(int edible) {
+        return switch (edible) {
+            case 0 -> ParticleTypes.COMPOSTER;
+            case 1 -> ParticleTypes.CRIT;
+            default -> ParticleTypes.CRIT;
+        };
     }
 
     @Inject(method = "handleStatus", at = @At("HEAD"))
@@ -321,15 +335,17 @@ public abstract class SGEAnimalEntityMixin extends MobEntity implements IBreedab
 
     @Override
     protected void onEquipStack(ItemStack stack) {
-        var isEdibleItem = isEdibleItem(stack);
-        var isBreedableItem = isBreedableItem(stack);
+        if (!world.isClient) {
+            var isEdibleItem = isEdibleItem(stack);
+            var isBreedableItem = isBreedableItem(stack);
 
-        if (!(isEdibleItem || isBreedableItem)) {
-            super.onEquipStack(stack);
-            return;
+            if (!(isEdibleItem || isBreedableItem)) {
+                super.onEquipStack(stack);
+                return;
+            }
+
+            eat(stack);
         }
-
-        eat(stack);
     }
 
 
