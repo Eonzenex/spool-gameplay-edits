@@ -1,4 +1,4 @@
-package net.eonzenx.spool_ge.mixin;
+package net.eonzenx.spool_ge.mixin.entities;
 
 import net.eonzenx.spool_ge.config.Config;
 import net.eonzenx.spool_ge.utils.mixin.server.IBedRespawn;

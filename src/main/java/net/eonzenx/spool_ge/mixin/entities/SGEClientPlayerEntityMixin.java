@@ -1,4 +1,4 @@
-package net.eonzenx.spool_ge.mixin;
+package net.eonzenx.spool_ge.mixin.entities;
 
 import com.mojang.authlib.GameProfile;
 import net.eonzenx.spool_ge.utils.mixin.travel.ITickMovement;
@@ -10,6 +10,7 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.JumpingMount;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;

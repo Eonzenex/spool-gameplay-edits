@@ -1,4 +1,4 @@
-package net.eonzenx.spool_ge.mixin;
+package net.eonzenx.spool_ge.mixin.entities;
 
 import net.eonzenx.spool_ge.utils.mixin.travel.ICheckGliding;
 import net.eonzenx.spool_ge.utils.mixin.travel.ITravel;

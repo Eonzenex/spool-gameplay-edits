@@ -1,4 +1,4 @@
-package net.eonzenx.spool_ge.mixin;
+package net.eonzenx.spool_ge.mixin.entities;
 
 import net.eonzenx.spool_ge.entities.items.SGEElytraItem;
 import net.eonzenx.spool_ge.config.Config;
@@ -28,9 +28,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public abstract class SGELivingEntityMixin extends Entity implements ITravel
+public abstract class SGETravelLivingEntityMixin extends Entity implements ITravel
 {
-    public SGELivingEntityMixin(EntityType<?> type, World world) { super(type, world); }
+    public SGETravelLivingEntityMixin(EntityType<?> type, World world) { super(type, world); }
 
     @Shadow protected int roll;
 

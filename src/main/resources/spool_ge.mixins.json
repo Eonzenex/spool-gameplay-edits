@@ -5,13 +5,21 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "SGEElytraFeatureRendererMixin",
-    "SGELivingEntityMixin",
-    "SGEPlayerEntityMixin",
     "SGEPlayerManagerMixin",
-    "SGEServerPlayerEntityMixin"
+    "entities.SGEPlayerEntityMixin",
+    "entities.SGEServerPlayerEntityMixin",
+    "entities.SGETravelLivingEntityMixin",
+    "entities.animals.SGEAnimalEntityMixin",
+    "entities.animals.SGEChickenMixin",
+    "entities.animals.SGECowMixin",
+    "entities.animals.SGEFoxMixin",
+    "entities.animals.SGEHorseBaseEntityMixin",
+    "entities.animals.SGEOcelotMixin",
+    "entities.animals.SGEPigMixin",
+    "entities.animals.SGESheepMixin"
   ],
   "client": [
-    "SGEClientPlayerEntityMixin"
+    "entities.SGEClientPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
